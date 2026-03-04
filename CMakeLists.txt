@@ -1,10 +1,10 @@
-﻿cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.22)
 project(IzoClone VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# â”€â”€â”€ Fetch JUCE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─── Fetch JUCE ───────────────────────────────────────────────────────────────
 include(FetchContent)
 FetchContent_Declare(
     JUCE
@@ -13,7 +13,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(JUCE)
 
-# â”€â”€â”€ Plugin Target â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─── Plugin Target ────────────────────────────────────────────────────────────
 juce_add_plugin(IzoClone
     COMPANY_NAME            "YourStudio"
     PLUGIN_MANUFACTURER_CODE Ystu
@@ -29,7 +29,7 @@ juce_add_plugin(IzoClone
     VST3_CATEGORIES         "Mastering" "Dynamics" "EQ"
 )
 
-# â”€â”€â”€ Sources â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─── Sources ──────────────────────────────────────────────────────────────────
 target_sources(IzoClone PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
@@ -49,7 +49,7 @@ target_sources(IzoClone PRIVATE
     Source/Utils/PresetManager.cpp
 )
 
-# â”€â”€â”€ Compile Definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─── Compile Definitions ──────────────────────────────────────────────────────
 target_compile_definitions(IzoClone PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
@@ -58,7 +58,7 @@ target_compile_definitions(IzoClone PUBLIC
     JUCE_REPORT_APP_USAGE=0
 )
 
-# â”€â”€â”€ JUCE Modules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─── JUCE Modules ─────────────────────────────────────────────────────────────
 target_link_libraries(IzoClone PRIVATE
     juce::juce_audio_basics
     juce::juce_audio_devices
@@ -73,10 +73,9 @@ target_link_libraries(IzoClone PRIVATE
     juce::juce_graphics
     juce::juce_gui_basics
     juce::juce_gui_extra
-    juce::recommended_warning_flags
 )
 
-# â”€â”€â”€ Optimisation Flags â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─── Optimisation Flags ───────────────────────────────────────────────────────
 if(MSVC)
     target_compile_options(IzoClone PRIVATE /O2 /arch:AVX2 /fp:fast)
 else()
