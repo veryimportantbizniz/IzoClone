@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.22)
-project(IzoClone VERSION 1.0.0)
+﻿cmake_minimum_required(VERSION 3.22)
+project(LoveMaster VERSION 2.0.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# ─── Fetch JUCE ───────────────────────────────────────────────────────────────
 include(FetchContent)
 FetchContent_Declare(
     JUCE
@@ -13,13 +12,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(JUCE)
 
-# ─── Plugin Target ────────────────────────────────────────────────────────────
-juce_add_plugin(IzoClone
-    COMPANY_NAME                "YourStudio"
-    PLUGIN_MANUFACTURER_CODE    Ystu
-    PLUGIN_CODE                 Mfrg
+juce_add_plugin(LoveMaster
+    COMPANY_NAME                "LoveMaster"
+    PLUGIN_MANUFACTURER_CODE    Lvms
+    PLUGIN_CODE                 Lvm1
     FORMATS                     VST3 Standalone
-    PRODUCT_NAME                "IzoClone"
+    PRODUCT_NAME                "LoveMaster"
     IS_SYNTH                    FALSE
     NEEDS_MIDI_INPUT            FALSE
     NEEDS_MIDI_OUTPUT           FALSE
@@ -29,8 +27,7 @@ juce_add_plugin(IzoClone
     VST3_CATEGORIES             "Mastering" "Dynamics" "EQ"
 )
 
-# ─── Sources ──────────────────────────────────────────────────────────────────
-target_sources(IzoClone PRIVATE
+target_sources(LoveMaster PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
     Source/Processors/EQProcessor.cpp
@@ -43,8 +40,7 @@ target_sources(IzoClone PRIVATE
     Source/Utils/PresetManager.cpp
 )
 
-# ─── Compile Definitions ──────────────────────────────────────────────────────
-target_compile_definitions(IzoClone PUBLIC
+target_compile_definitions(LoveMaster PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -52,8 +48,7 @@ target_compile_definitions(IzoClone PUBLIC
     JUCE_REPORT_APP_USAGE=0
 )
 
-# ─── JUCE Modules ─────────────────────────────────────────────────────────────
-target_link_libraries(IzoClone PRIVATE
+target_link_libraries(LoveMaster PRIVATE
     juce::juce_audio_basics
     juce::juce_audio_devices
     juce::juce_audio_formats
@@ -69,12 +64,11 @@ target_link_libraries(IzoClone PRIVATE
     juce::juce_gui_extra
 )
 
-# ─── Generate JuceHeader.h (must be after target_link_libraries) ──────────────
-juce_generate_juce_header(IzoClone)
+juce_generate_juce_header(LoveMaster)
 
-# ─── Optimisation Flags ───────────────────────────────────────────────────────
 if(MSVC)
-    target_compile_options(IzoClone PRIVATE /O2 /arch:AVX2 /fp:fast)
+    target_compile_options(LoveMaster PRIVATE /O2 /arch:AVX2 /fp:fast)
 else()
-    target_compile_options(IzoClone PRIVATE -O3 -mavx2 -ffast-math)
+    target_compile_options(LoveMaster PRIVATE -O3 -mavx2 -ffast-math)
 endif()
+

@@ -3,21 +3,16 @@
 #include "Processors/EQProcessor.h"
 #include "Processors/AllProcessors.h"
 #include "Processors/LimiterProcessor.h"
-#include "Utils/PresetManager.h"
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-//  IzoCloneProcessor
-//  Signal chain (in order):
-//    Input â†’ EQ â†’ Multiband Compressor â†’ Stereo Imager â†’ Exciter â†’ Limiter â†’ Output
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-class IzoCloneProcessor : public juce::AudioProcessor,
-                              public juce::AudioProcessorValueTreeState::Listener
+class LoveMasterEditor;
+
+class LoveMasterProcessor : public juce::AudioProcessor,
+                             public juce::AudioProcessorValueTreeState::Listener
 {
 public:
-    IzoCloneProcessor();
-    ~IzoCloneProcessor() override;
+    LoveMasterProcessor();
+    ~LoveMasterProcessor() override;
 
-    // â”€â”€ AudioProcessor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
@@ -25,7 +20,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "IzoClone"; }
+    const juce::String getName() const override { return "LoveMaster"; }
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
     double getTailLengthSeconds() const override { return 0.0; }
@@ -38,42 +33,24 @@ public:
 
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
-
-    // â”€â”€ Parameter listener â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     void parameterChanged(const juce::String& parameterID, float newValue) override;
 
-    // â”€â”€ Parameter Tree â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     juce::AudioProcessorValueTreeState apvts;
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-    // â”€â”€ Public DSP access (for UI metering) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    LoudnessMeter&      getLoudnessMeter()   { return loudnessMeter; }
-    FFTAnalyzer&        getFFTAnalyzer()     { return fftAnalyzer; }
-    EQProcessor&        getEQProcessor()     { return eqProcessor; }
-    CompressorProcessor& getCompProcessor()  { return compProcessor; }
-    LimiterProcessor&   getLimiterProcessor(){ return limiterProcessor; }
-    StereoImagerProcessor& getStereoProcessor() { return stereoProcessor; }
+    // â”€â”€ Public accessors for UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    LoudnessMeter&         getLoudnessMeter()  { return loudnessMeter; }
+    FFTAnalyzer&           getFFTAnalyzer()    { return fftAnalyzer; }
+    LimiterProcessor&      getLimiterProcessor(){ return limiterProcessor; }
 
-    PresetManager& getPresetManager() { return presetManager; }
-
-    // â”€â”€ A/B Comparison â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    void snapshotToSlot(int slot);   // slot 0 = A, slot 1 = B
-    void recallSlot(int slot);
-    bool hasSlot(int slot) const { return !abSlots[slot].isEmpty(); }
-
-    // â”€â”€ LUFS Auto-gain â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    void setAutoGainEnabled(bool enabled) { autoGainEnabled.store(enabled, std::memory_order_relaxed); }
-    bool isAutoGainEnabled() const        { return autoGainEnabled.load(std::memory_order_relaxed); }
-
-    // â”€â”€ Module bypass states (thread-safe atomic) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    std::atomic<bool> eqBypassed      { false };
-    std::atomic<bool> compBypassed    { false };
-    std::atomic<bool> stereoBypassed  { false };
-    std::atomic<bool> exciterBypassed { false };
-    std::atomic<bool> limiterBypassed { false };
+    // Waveform data for UI (ring buffer, UI polls this)
+    float getWaveformSample(int index) const { return waveformRing[index & (WAVEFORM_SIZE-1)]; }
+    static constexpr int WAVEFORM_SIZE = 512;
 
 private:
-    // â”€â”€ Processing chain â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    void applyLoveMacro(float love);
+    void applyAutoMudRemoval(juce::AudioBuffer<float>& buffer);
+
     EQProcessor           eqProcessor;
     CompressorProcessor   compProcessor;
     StereoImagerProcessor stereoProcessor;
@@ -82,18 +59,19 @@ private:
     LoudnessMeter         loudnessMeter;
     FFTAnalyzer           fftAnalyzer;
 
+    // Mud detection â€” simple one-pole IIR bandpass energy tracker
+    float mudEnergy     = 0.f;
+    float mudGainSmooth = 1.f;
+    juce::dsp::StateVariableTPTFilter<float> mudBandpass;
+    bool mudFilterReady = false;
+
+    // Waveform ring buffer (written on audio thread, read on UI thread)
+    std::array<std::atomic<float>, WAVEFORM_SIZE> waveformRing;
+    std::atomic<int> waveformWritePos { 0 };
+
     double currentSampleRate = 44100.0;
     int    currentBlockSize  = 512;
 
-    PresetManager presetManager { apvts };
-
-    // A/B state slots (serialised APVTS XML)
-    juce::MemoryBlock abSlots[2];
-
-    // LUFS auto-gain
-    std::atomic<bool> autoGainEnabled { false };
-    float             autoGainSmoothDb = 0.f;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IzoCloneProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoveMasterProcessor)
 };
 
