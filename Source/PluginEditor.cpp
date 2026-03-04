@@ -183,7 +183,7 @@ void LoveMasterEditor::paintWaveform(juce::Graphics& g)
     g.strokePath(wave, juce::PathStrokeType(1.6f));
 }
 
-void LoveMasterEditor::paintSpinningHeart(juce::Graphics& g)
+void LoveMasterEditor::paintOscDisplay(juce::Graphics& g)
 {
     int mainW = triageOpen ? getWidth() - TRIAGE_WIDTH : getWidth();
     float cx = (float)mainW - 22.f;
