@@ -15,37 +15,31 @@ FetchContent_MakeAvailable(JUCE)
 
 # ─── Plugin Target ────────────────────────────────────────────────────────────
 juce_add_plugin(IzoClone
-    COMPANY_NAME            "YourStudio"
-    PLUGIN_MANUFACTURER_CODE Ystu
-    PLUGIN_CODE             Mfrg
-    FORMATS                 VST3 Standalone
-    PRODUCT_NAME            "IzoClone"
-    IS_SYNTH                FALSE
-    NEEDS_MIDI_INPUT        FALSE
-    NEEDS_MIDI_OUTPUT       FALSE
-    IS_MIDI_EFFECT          FALSE
+    COMPANY_NAME                "YourStudio"
+    PLUGIN_MANUFACTURER_CODE    Ystu
+    PLUGIN_CODE                 Mfrg
+    FORMATS                     VST3 Standalone
+    PRODUCT_NAME                "IzoClone"
+    IS_SYNTH                    FALSE
+    NEEDS_MIDI_INPUT            FALSE
+    NEEDS_MIDI_OUTPUT           FALSE
+    IS_MIDI_EFFECT              FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
-    COPY_PLUGIN_AFTER_BUILD TRUE
-    VST3_CATEGORIES         "Mastering" "Dynamics" "EQ"
+    COPY_PLUGIN_AFTER_BUILD     FALSE
+    VST3_CATEGORIES             "Mastering" "Dynamics" "EQ"
 )
 
 # ─── Sources ──────────────────────────────────────────────────────────────────
 target_sources(IzoClone PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
-
-    # DSP Processors
     Source/Processors/EQProcessor.cpp
     Source/Processors/CompressorProcessor.cpp
     Source/Processors/LimiterProcessor.cpp
     Source/Processors/StereoImagerProcessor.cpp
     Source/Processors/ExciterProcessor.cpp
     Source/Processors/MeterAndFFT.cpp
-
-    # UI Modules (header-only components)
     Source/UI/LookAndFeel.cpp
-
-    # Utils
     Source/Utils/PresetManager.cpp
 )
 
@@ -75,10 +69,12 @@ target_link_libraries(IzoClone PRIVATE
     juce::juce_gui_extra
 )
 
+# ─── Generate JuceHeader.h (must be after target_link_libraries) ──────────────
+juce_generate_juce_header(IzoClone)
+
 # ─── Optimisation Flags ───────────────────────────────────────────────────────
 if(MSVC)
     target_compile_options(IzoClone PRIVATE /O2 /arch:AVX2 /fp:fast)
 else()
     target_compile_options(IzoClone PRIVATE -O3 -mavx2 -ffast-math)
 endif()
-
