@@ -3,43 +3,40 @@
 LoveMasterEditor::LoveMasterEditor(LoveMasterProcessor& p)
     : AudioProcessorEditor(&p), processor(p)
 {
-    setSize(MAIN_WIDTH, MAIN_HEIGHT);
-    setResizable(false, false);
+    setSize(BASE_WIDTH, BASE_HEIGHT);
+    setResizable(true, true);
+    setResizeLimits(320, 220, 1200, 800);
 
-    // â”€â”€ Love knob â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    loveKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    loveKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    loveKnob.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xffe8003a));
-    loveKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xffff6b8a));
-    loveKnob.setColour(juce::Slider::thumbColourId, juce::Colour(0xffff0040));
-    loveKnob.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xffe8003a));
-    loveKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
-    addAndMakeVisible(loveKnob);
+    // ── EKG Slider ────────────────────────────────────────────────────────────
+    float initLove = processor.apvts.getRawParameterValue("love")->load() / 100.f;
+    ekgSlider.value = initLove;
+    ekgSlider.onValueChange = [this](float v) {
+        if (auto* param = processor.apvts.getParameter("love"))
+            param->setValueNotifyingHost(v);
+    };
+    addAndMakeVisible(ekgSlider);
 
-    loveAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        processor.apvts, "love", loveKnob);
-
-    loveLabel.setText("LOVE", juce::dontSendNotification);
-    loveLabel.setFont(juce::Font("Georgia", 18.f, juce::Font::bold | juce::Font::italic));
+    loveLabel.setText("L O V E", juce::dontSendNotification);
+    loveLabel.setFont(juce::Font("Georgia", 15.f, juce::Font::bold | juce::Font::italic));
     loveLabel.setColour(juce::Label::textColourId, juce::Colour(0xffe8003a));
     loveLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(loveLabel);
 
-    // â”€â”€ Triage knobs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Triage knobs ──────────────────────────────────────────────────────────
     for (int i = 0; i < 8; ++i)
     {
         auto& tk = triageKnobs[i];
         tk.slider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-        tk.slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 58, 16);
-        tk.slider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xffcc0033));
+        tk.slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 56, 14);
+        tk.slider.setColour(juce::Slider::rotarySliderFillColourId,    juce::Colour(0xffcc0033));
         tk.slider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xffff6b8a));
-        tk.slider.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xff880020));
-        tk.slider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+        tk.slider.setColour(juce::Slider::textBoxTextColourId,         juce::Colour(0xff880020));
+        tk.slider.setColour(juce::Slider::textBoxOutlineColourId,      juce::Colours::transparentBlack);
         tk.slider.setVisible(false);
         addChildComponent(tk.slider);
 
         tk.label.setText(triageLabels[i], juce::dontSendNotification);
-        tk.label.setFont(juce::Font("Arial", 10.f, juce::Font::plain));
+        tk.label.setFont(juce::Font("Arial", 9.f, juce::Font::plain));
         tk.label.setColour(juce::Label::textColourId, juce::Colour(0xff880020));
         tk.label.setJustificationType(juce::Justification::centred);
         tk.label.setVisible(false);
@@ -49,11 +46,11 @@ LoveMasterEditor::LoveMasterEditor(LoveMasterProcessor& p)
             processor.apvts, triageParamIDs[i], tk.slider);
     }
 
-    // â”€â”€ For Nerds button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── For Nerds button ──────────────────────────────────────────────────────
     nerdsButton.setButtonText("for nerds");
-    nerdsButton.setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-    nerdsButton.setColour(juce::TextButton::textColourOffId, juce::Colour(0xffcccccc));
-    nerdsButton.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
+    nerdsButton.setColour(juce::TextButton::buttonColourId,   juce::Colours::transparentBlack);
+    nerdsButton.setColour(juce::TextButton::textColourOffId,  juce::Colour(0xffbbbbbb));
+    nerdsButton.setColour(juce::ComboBox::outlineColourId,    juce::Colours::transparentBlack);
     nerdsButton.onClick = [this]() {
         if (!triageOpen) openTriageCenter();
         else             closeTriageCenter();
@@ -63,126 +60,139 @@ LoveMasterEditor::LoveMasterEditor(LoveMasterProcessor& p)
     startTimerHz(60);
 }
 
-LoveMasterEditor::~LoveMasterEditor()
-{
-    stopTimer();
-}
+LoveMasterEditor::~LoveMasterEditor() { stopTimer(); }
 
-// â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Layout — all proportional to current size ─────────────────────────────────
 void LoveMasterEditor::resized()
 {
     int w = getWidth();
     int h = getHeight();
+    int mainW = triageOpen ? w - TRIAGE_WIDTH : w;
 
-    // Love knob â€” centred in main area
-    int knobSize = 160;
-    int knobX = (MAIN_WIDTH - knobSize) / 2;
-    int knobY = 80;
-    loveKnob.setBounds(knobX, knobY, knobSize, knobSize);
-    loveLabel.setBounds(knobX, knobY - 28, knobSize, 24);
+    // Title area height proportional
+    int titleH = juce::jmax(28, h / 10);
 
-    // For Nerds button â€” bottom left
-    nerdsButton.setBounds(8, h - 26, 80, 20);
+    // EKG slider — centre of the main area, takes up most of the width
+    int sliderH  = juce::jmax(80, h / 3);
+    int sliderY  = titleH + (h - titleH - sliderH - 80) / 2;
+    int sliderPad = mainW / 12;
+    ekgSlider.setBounds(sliderPad, sliderY, mainW - sliderPad * 2, sliderH);
 
-    // Triage knobs â€” 4x2 grid in the right panel
+    // Label above slider
+    loveLabel.setBounds(sliderPad, sliderY - 24, mainW - sliderPad * 2, 20);
+
+    // For Nerds button — bottom left
+    nerdsButton.setBounds(8, h - 24, 76, 18);
+
+    // Triage panel
     if (triageOpen)
     {
-        int triageX = MAIN_WIDTH + 10;
-        int cols = 4, rows = 2;
-        int kw = 68, kh = 80;
+        int triageX = w - TRIAGE_WIDTH;
+        int cols = 4, kw = 60, kh = 70;
         int padX = (TRIAGE_WIDTH - cols * kw) / (cols + 1);
-        int padY = 60;
+        int padY = titleH + 20;
 
         for (int i = 0; i < 8; ++i)
         {
             int col = i % cols;
             int row = i / cols;
             int x = triageX + padX + col * (kw + padX);
-            int y = padY + row * (kh + 30);
-            triageKnobs[i].slider.setBounds(x, y, kw, kh - 18);
-            triageKnobs[i].label.setBounds(x, y + kh - 16, kw, 16);
+            int y = padY + row * (kh + 28);
+            triageKnobs[i].slider.setBounds(x, y, kw, kh);
+            triageKnobs[i].label.setBounds(x, y + kh, kw, 14);
         }
     }
 }
 
-// â”€â”€ Paint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Paint ─────────────────────────────────────────────────────────────────────
 void LoveMasterEditor::paint(juce::Graphics& g)
 {
-    // Flat white background
+    int w = getWidth();
+    int h = getHeight();
+    int mainW = triageOpen ? w - TRIAGE_WIDTH : w;
+
+    // Flat white
     g.fillAll(juce::Colours::white);
 
-    // Triage panel background
+    // Triage panel
     if (triageOpen)
     {
         g.setColour(juce::Colour(0xfff8f0f2));
-        g.fillRect(MAIN_WIDTH, 0, TRIAGE_WIDTH, getHeight());
+        g.fillRect(w - TRIAGE_WIDTH, 0, TRIAGE_WIDTH, h);
         g.setColour(juce::Colour(0xffff6b8a));
-        g.drawLine((float)MAIN_WIDTH, 0.f, (float)MAIN_WIDTH, (float)getHeight(), 1.5f);
+        g.drawLine((float)(w - TRIAGE_WIDTH), 0.f, (float)(w - TRIAGE_WIDTH), (float)h, 1.5f);
 
-        // Triage Center title
+        float titleSize = juce::jmap((float)w, 320.f, 1200.f, 11.f, 16.f);
+        g.setFont(juce::Font("Georgia", titleSize, juce::Font::bold | juce::Font::italic));
         g.setColour(juce::Colour(0xffe8003a));
-        g.setFont(juce::Font("Georgia", 14.f, juce::Font::bold | juce::Font::italic));
-        g.drawText("Triage Center", MAIN_WIDTH, 20, TRIAGE_WIDTH, 28,
+        g.drawText("Triage Center", w - TRIAGE_WIDTH, 12, TRIAGE_WIDTH, 22,
                    juce::Justification::centred);
     }
 
-    // Plugin name
-    g.setFont(juce::Font("Georgia", 22.f, juce::Font::bold | juce::Font::italic));
+    // Plugin title — scales with window
+    float titleSize = juce::jmap((float)h, 220.f, 800.f, 16.f, 28.f);
+    g.setFont(juce::Font("Georgia", titleSize, juce::Font::bold | juce::Font::italic));
     g.setColour(juce::Colour(0xffe8003a));
-    g.drawText("LoveMaster", 0, 14, MAIN_WIDTH, 30, juce::Justification::centred);
+    g.drawText("LoveMaster", 0, 8, mainW, (int)titleSize + 8, juce::Justification::centred);
 
-    // Waveform display
+    // Waveform
     paintWaveform(g);
 
-    // Spinning heart
+    // Spinning heart (top right)
     paintSpinningHeart(g);
 
-    // Nerd Found overlay
+    // Nerd Found
     if (nerdFoundVisible)
         paintNerdFoundOverlay(g);
 }
 
 void LoveMasterEditor::paintWaveform(juce::Graphics& g)
 {
-    const int wx = 20, wy = 260, ww = MAIN_WIDTH - 40, wh = 50;
+    int w = getWidth();
+    int h = getHeight();
+    int mainW = triageOpen ? w - TRIAGE_WIDTH : w;
 
-    // Background track
+    int waveH = juce::jmax(36, h / 7);
+    int waveY = h - waveH - 30;
+    int wavePad = mainW / 16;
+    int waveW = mainW - wavePad * 2;
+
     g.setColour(juce::Colour(0xfff5e8eb));
-    g.fillRoundedRectangle((float)wx, (float)wy, (float)ww, (float)wh, 4.f);
+    g.fillRoundedRectangle((float)(wavePad), (float)waveY,
+                            (float)waveW, (float)waveH, 4.f);
 
-    // Draw waveform in reds
     juce::Path wave;
     bool first = true;
-    for (int x = 0; x < ww; ++x)
+    for (int x = 0; x < waveW; ++x)
     {
-        int idx = (x * LoveMasterProcessor::WAVEFORM_SIZE / ww) & (LoveMasterProcessor::WAVEFORM_SIZE - 1);
-        float sample = waveformDisplay[x * 256 / ww];
-        float y = wy + wh * 0.5f - sample * wh * 0.45f;
-        y = juce::jlimit((float)wy, (float)(wy + wh), y);
-        if (first) { wave.startNewSubPath((float)(wx + x), y); first = false; }
-        else        wave.lineTo((float)(wx + x), y);
+        int idx = x * 256 / waveW;
+        float sample = waveformDisplay[juce::jlimit(0, 255, idx)];
+        float cy = waveY + waveH * 0.5f - sample * waveH * 0.42f;
+        cy = juce::jlimit((float)waveY, (float)(waveY + waveH), cy);
+        if (first) { wave.startNewSubPath((float)(wavePad + x), cy); first = false; }
+        else          wave.lineTo((float)(wavePad + x), cy);
     }
 
-    // Colour based on level
     float rms = 0.f;
     for (auto v : waveformDisplay) rms += v * v;
     rms = std::sqrt(rms / 256.f);
     float loud = juce::jlimit(0.f, 1.f, rms * 8.f);
 
-    juce::Colour waveColour = juce::Colour(0xffffb3c1).interpolatedWith(juce::Colour(0xffaa0020), loud);
-    g.setColour(waveColour);
-    g.strokePath(wave, juce::PathStrokeType(1.8f));
+    juce::Colour waveCol = juce::Colour(0xffffb3c1).interpolatedWith(juce::Colour(0xffaa0020), loud);
+    g.setColour(waveCol);
+    g.strokePath(wave, juce::PathStrokeType(1.6f));
 }
 
 void LoveMasterEditor::paintSpinningHeart(juce::Graphics& g)
 {
-    // Spinning heart lives top-right corner
-    const float cx = MAIN_WIDTH - 28.f, cy = 22.f, size = 14.f;
+    int mainW = triageOpen ? getWidth() - TRIAGE_WIDTH : getWidth();
+    float cx = (float)mainW - 22.f;
+    float cy = 18.f;
+    float size = juce::jmap((float)getHeight(), 220.f, 800.f, 10.f, 18.f);
 
     juce::Graphics::ScopedSaveState save(g);
     g.addTransform(juce::AffineTransform::rotation(heartAngle, cx, cy));
 
-    // Draw a heart shape
     juce::Path heart;
     heart.startNewSubPath(cx, cy + size * 0.3f);
     heart.cubicTo(cx - size, cy - size * 0.5f,
@@ -192,83 +202,80 @@ void LoveMasterEditor::paintSpinningHeart(juce::Graphics& g)
                   cx + size, cy - size * 0.5f,
                   cx, cy + size * 0.3f);
 
-    float love = (float)processor.apvts.getRawParameterValue("love")->load() / 100.f;
-    juce::Colour heartColour = juce::Colour(0xffffb3c1).interpolatedWith(juce::Colour(0xffe8003a), love);
-    g.setColour(heartColour);
+    float love = ekgSlider.value;
+    g.setColour(juce::Colour(0xffffb3c1).interpolatedWith(juce::Colour(0xffe8003a), love));
     g.fillPath(heart);
 }
 
 void LoveMasterEditor::paintNerdFoundOverlay(juce::Graphics& g)
 {
-    // Dark vignette
+    int w = getWidth(), h = getHeight();
     juce::ColourGradient vignette(
-        juce::Colours::black.withAlpha(0.85f * nerdFoundAlpha), (float)getWidth() * 0.5f, (float)getHeight() * 0.5f,
-        juce::Colours::black.withAlpha(0.3f  * nerdFoundAlpha), 0.f, 0.f,
+        juce::Colours::black.withAlpha(0.85f * nerdFoundAlpha), w * 0.5f, h * 0.5f,
+        juce::Colours::black.withAlpha(0.25f * nerdFoundAlpha), 0.f, 0.f,
         true);
     g.setGradientFill(vignette);
     g.fillAll();
 
-    // "NERD FOUND" in gothic style
-    g.setFont(juce::Font("Georgia", 38.f, juce::Font::bold | juce::Font::italic));
-    g.setColour(juce::Colour(0xffff6b8a).withAlpha(nerdFoundAlpha));
+    float fontSize = juce::jmap((float)w, 320.f, 1200.f, 28.f, 52.f);
+    g.setFont(juce::Font("Georgia", fontSize, juce::Font::bold | juce::Font::italic));
 
-    // Flicker effect â€” slight offset shadow first
-    g.setColour(juce::Colour(0xff880020).withAlpha(nerdFoundAlpha * 0.6f));
-    g.drawText("NERD FOUND", 3, getHeight()/2 - 27, getWidth(), 54, juce::Justification::centred);
+    g.setColour(juce::Colour(0xff880020).withAlpha(nerdFoundAlpha * 0.5f));
+    g.drawText("NERD FOUND", 3, h/2 - (int)(fontSize/2) - 2, w, (int)fontSize + 8,
+               juce::Justification::centred);
 
     g.setColour(juce::Colour(0xffff6b8a).withAlpha(nerdFoundAlpha));
-    g.drawText("NERD FOUND", 0, getHeight()/2 - 28, getWidth(), 54, juce::Justification::centred);
+    g.drawText("NERD FOUND", 0, h/2 - (int)(fontSize/2) - 4, w, (int)fontSize + 8,
+               juce::Justification::centred);
 }
 
-// â”€â”€ Timer â€” 60hz animation tick â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Timer ─────────────────────────────────────────────────────────────────────
 void LoveMasterEditor::timerCallback()
 {
-    float love = (float)processor.apvts.getRawParameterValue("love")->load() / 100.f;
+    // Sync EKG slider value from APVTS (in case host automation changes it)
+    float love = processor.apvts.getRawParameterValue("love")->load() / 100.f;
+    if (std::abs(love - ekgSlider.value) > 0.005f)
+        ekgSlider.value = love;
 
-    // Spin heart â€” faster with more love
-    heartAngle += 0.008f + love * 0.06f;
+    // Pulse amount drives heart glow
+    heartPulse = heartPulse * 0.85f + love * 0.15f;
+    ekgSlider.setPulse(heartPulse);
+
+    // Spinning heart — speed proportional to love
+    heartAngle += 0.006f + love * 0.055f;
     if (heartAngle > juce::MathConstants<float>::twoPi)
         heartAngle -= juce::MathConstants<float>::twoPi;
 
-    // Update waveform display with smoothing
+    // Waveform smoothing
     for (int i = 0; i < 256; ++i)
     {
-        int srcIdx = (i * LoveMasterProcessor::WAVEFORM_SIZE / 256) & (LoveMasterProcessor::WAVEFORM_SIZE - 1);
+        int srcIdx = (i * LoveMasterProcessor::WAVEFORM_SIZE / 256)
+                     & (LoveMasterProcessor::WAVEFORM_SIZE - 1);
         float incoming = processor.getWaveformSample(srcIdx);
-        waveformDisplay[i] = waveformDisplay[i] * 0.7f + incoming * 0.3f;
+        waveformDisplay[i] = waveformDisplay[i] * 0.72f + incoming * 0.28f;
     }
 
-    // Nerd Found animation
+    // Nerd Found fade
     if (nerdFoundVisible)
     {
         nerdFoundTimer++;
-        if (nerdFoundTimer < 15)
-            nerdFoundAlpha = (float)nerdFoundTimer / 15.f;
-        else if (nerdFoundTimer > 75)
-            nerdFoundAlpha = 1.f - (float)(nerdFoundTimer - 75) / 15.f;
+        if      (nerdFoundTimer < 15)  nerdFoundAlpha = (float)nerdFoundTimer / 15.f;
+        else if (nerdFoundTimer > 75)  nerdFoundAlpha = 1.f - (float)(nerdFoundTimer - 75) / 15.f;
+        else                           nerdFoundAlpha = 1.f;
 
-        if (nerdFoundTimer > 90)
-        {
-            nerdFoundVisible = false;
-            nerdFoundAlpha   = 0.f;
-        }
+        if (nerdFoundTimer > 90) { nerdFoundVisible = false; nerdFoundAlpha = 0.f; }
     }
 
     repaint();
 }
 
-// â”€â”€ Triage open/close â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Triage open / close ───────────────────────────────────────────────────────
 void LoveMasterEditor::openTriageCenter()
 {
     triageOpen = true;
-    setSize(MAIN_WIDTH + TRIAGE_WIDTH, MAIN_HEIGHT);
+    setSize(getWidth() + TRIAGE_WIDTH, getHeight());
+    for (auto& tk : triageKnobs) { tk.slider.setVisible(true); tk.label.setVisible(true); }
 
-    for (auto& tk : triageKnobs) {
-        tk.slider.setVisible(true);
-        tk.label.setVisible(true);
-    }
-
-    // Trigger NERD FOUND
     nerdFoundVisible = true;
     nerdFoundAlpha   = 0.f;
     nerdFoundTimer   = 0;
@@ -280,14 +287,9 @@ void LoveMasterEditor::openTriageCenter()
 void LoveMasterEditor::closeTriageCenter()
 {
     triageOpen = false;
-    setSize(MAIN_WIDTH, MAIN_HEIGHT);
-
-    for (auto& tk : triageKnobs) {
-        tk.slider.setVisible(false);
-        tk.label.setVisible(false);
-    }
+    setSize(getWidth() - TRIAGE_WIDTH, getHeight());
+    for (auto& tk : triageKnobs) { tk.slider.setVisible(false); tk.label.setVisible(false); }
 
     nerdsButton.setButtonText("for nerds");
     resized();
 }
-
