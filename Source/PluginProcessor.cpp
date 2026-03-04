@@ -200,11 +200,6 @@ juce::AudioProcessorEditor* IzoCloneProcessor::createEditor()
     return new IzoCloneEditor(*this);
 }
 
-juce::AudioProcessorEditor* IzoCloneProcessor::createEditor()
-{
-    return new IzoCloneEditor(*this);
-}
-
 // â”€â”€ A/B Comparison â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 void IzoCloneProcessor::snapshotToSlot(int slot)
 {

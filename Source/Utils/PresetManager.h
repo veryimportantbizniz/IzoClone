@@ -116,7 +116,7 @@ private:
         float hsFreq, float hsGain,
         float compThresh, float compRatio, float compAttack, float compRelease,
         float monoLo, float width,
-        float excDrive, float excMix, float excFreq,
+        float excDrive, float excMix, float excFreq, float excColor,
         float limCeil, float limLook, float limRel)
     {
         // Build a minimal APVTS-compatible XML manually
@@ -156,6 +156,7 @@ private:
         addParam("exciter_drive",     excDrive);
         addParam("exciter_mix",       excMix);
         addParam("exciter_freq",      excFreq);
+        addParam("exciter_color",     excColor);
         addParam("limiter_ceiling",   limCeil);
         addParam("limiter_lookahead", limLook);
         addParam("limiter_release",   limRel);

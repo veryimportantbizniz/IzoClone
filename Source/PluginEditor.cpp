@@ -68,10 +68,12 @@ void IzoCloneEditor::resized()
     toolbar->setBounds(area.removeFromTop(56));
     presetBar->setBounds(area.removeFromTop(34));
 
-    for (auto* m : { (juce::Component*)eqModule.get(), compModule.get(),
-                      stereoModule.get(), exciterModule.get(),
-                      limiterModule.get(), meterModule.get() })
-        m->setBounds(area);
+    eqModule     ->setBounds(area);
+    compModule   ->setBounds(area);
+    stereoModule ->setBounds(area);
+    exciterModule->setBounds(area);
+    limiterModule->setBounds(area);
+    meterModule  ->setBounds(area);
 }
 
 void IzoCloneEditor::showModule(int index)
