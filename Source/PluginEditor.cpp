@@ -139,7 +139,7 @@ void LoveMasterEditor::paint(juce::Graphics& g)
     paintWaveform(g);
 
     // Spinning heart (top right)
-    paintSpinningHeart(g);
+    paintOscDisplay(g);
 
     // Nerd Found
     if (nerdFoundVisible)
@@ -243,6 +243,8 @@ void LoveMasterEditor::timerCallback()
 
     // Spinning heart — speed proportional to love
     heartAngle += 0.006f + love * 0.055f;
+    oscPhase += 0.008f + love * 0.012f;
+    if (oscPhase > 1.f) oscPhase -= 1.f;
     if (heartAngle > juce::MathConstants<float>::twoPi)
         heartAngle -= juce::MathConstants<float>::twoPi;
 

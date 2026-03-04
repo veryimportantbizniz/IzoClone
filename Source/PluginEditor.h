@@ -158,7 +158,7 @@ private:
     void closeTriageCenter();
     void paintNerdFoundOverlay(juce::Graphics&);
     void paintWaveform(juce::Graphics&);
-    void paintSpinningHeart(juce::Graphics&);
+    void paintOscDisplay(juce::Graphics&);
 
     LoveMasterProcessor& processor;
 
@@ -192,6 +192,7 @@ private:
 
     // ── Animation ─────────────────────────────────────────────────────────────
     float heartAngle     = 0.f;
+    float oscPhase       = 0.f;  // oscilloscope heart drawing phase 0-1
     float heartPulse     = 0.f;
     std::array<float, 256> waveformDisplay {};
 
